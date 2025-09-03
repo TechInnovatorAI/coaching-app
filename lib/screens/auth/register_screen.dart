@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rank_up_na/viewmodels/auth_viewmodel.dart';
 import '../../utils/constants.dart';
 import '../../widgets/coach_kuya_card.dart';
 import '../../services/api_service.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -33,12 +35,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please agree to terms and conditions'),
-        ),
+        const SnackBar(content: Text('Please agree to the terms first')),
       );
       return;
     }
@@ -48,58 +48,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      // Call backend API
-      final response = await apiService.signup(
-        email: _emailController.text.trim(),
-        username: _usernameController.text.trim(),
-        password: _passwordController.text,
-        fullName: null, // Could add a full name field later
+      await ref
+          .read(authViewModelProvider.notifier)
+          .register(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+            username: _usernameController.text.trim(),
+            fullName: '',
+          );
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registration successful! Please log in.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
       );
 
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        
-        // Show success message from backend (includes Coach Kuya message)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Account created successfully!'),
-            backgroundColor: const Color(AppConstants.accentColor),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        
-        // Show Coach Kuya's welcome message if available
-        if (response['coach_kuya_says'] != null) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(response['coach_kuya_says']),
-                  backgroundColor: const Color(AppConstants.primaryColor),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
-          });
-        }
-        
-        context.go('/home');
-      }
+      // Navigate to login screen
+      context.go('/auth/login');
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -124,12 +111,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 // Coach Kuya welcome message
                 const CoachKuyaCard(
-                  message: 'Uy, bagong recruit! Tara na, mag-level up tayo sa ranking! 🚀',
+                  message:
+                      'Uy, bagong recruit! Tara na, mag-level up tayo sa ranking! 🚀',
                   showAvatar: true,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Username field
                 TextFormField(
                   controller: _usernameController,
@@ -151,9 +139,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Email field
                 TextFormField(
                   controller: _emailController,
@@ -176,9 +164,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Password field
                 TextFormField(
                   controller: _passwordController,
@@ -189,7 +177,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -211,9 +201,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Confirm password field
                 TextFormField(
                   controller: _confirmPasswordController,
@@ -224,7 +214,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                        _obscureConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -246,9 +238,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Terms and conditions checkbox
                 Row(
                   children: [
@@ -294,9 +286,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Register button
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleRegister,
@@ -316,9 +308,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Divider
                 const Row(
                   children: [
@@ -330,9 +322,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Expanded(child: Divider()),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Login redirect
                 TextButton(
                   onPressed: () => context.go('/auth/login'),

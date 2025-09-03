@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rank_up_na/viewmodels/auth_viewmodel.dart';
 import '../../utils/constants.dart';
 import '../../widgets/coach_kuya_card.dart';
 import '../../services/api_service.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -33,56 +35,43 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Call backend API
-      final response = await apiService.login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      await ref
+          .read(authViewModelProvider.notifier)
+          .login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login successful!'),
+          backgroundColor: Color(AppConstants.accentColor),
+          duration: Duration(seconds: 3),
+        ),
       );
 
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        
-        // Show success message from backend
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? 'Login successful!'),
-            backgroundColor: const Color(AppConstants.accentColor),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        
-        // Show Coach Kuya's welcome back message if available
-        if (response['coach_kuya_says'] != null) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(response['coach_kuya_says']),
-                  backgroundColor: const Color(AppConstants.primaryColor),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
-          });
-        }
-        
-        context.go('/home');
-      }
+      // Navigate to home screen
+      context.go('/home');
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -107,12 +96,13 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Coach Kuya welcome back message
                 const CoachKuyaCard(
-                  message: 'Uy balik ka na! Ready na ba tayo mag-rank up ulit? 🎮',
+                  message:
+                      'Uy balik ka na! Ready na ba tayo mag-rank up ulit? 🎮',
                   showAvatar: true,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Email field
                 TextFormField(
                   controller: _emailController,
@@ -135,9 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Password field
                 TextFormField(
                   controller: _passwordController,
@@ -148,7 +138,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -170,9 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 // Forgot password
                 Align(
                   alignment: Alignment.centerRight,
@@ -187,9 +179,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('Forgot Password?'),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Login button
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
@@ -209,9 +201,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Divider
                 const Row(
                   children: [
@@ -223,9 +215,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: Divider()),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Sign up redirect
                 TextButton(
                   onPressed: () => context.go('/auth/register'),
@@ -245,9 +237,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Continue as guest
                 OutlinedButton(
                   onPressed: () => context.go('/home'),
