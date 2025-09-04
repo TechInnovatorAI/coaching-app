@@ -105,7 +105,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         return Transform.scale(
                           scale: _skipButtonAnimation.value,
                           child: Opacity(
-                            opacity: _skipButtonAnimation.value,
+                            opacity: _skipButtonAnimation.value.clamp(0.0, 1.0),
+
+                            // opacity: _skipButtonAnimation.value,
                                                           child: Container(
                                 decoration: BoxDecoration(
                                   color: const Color(AppConstants.primaryColor).withOpacity(0.6),

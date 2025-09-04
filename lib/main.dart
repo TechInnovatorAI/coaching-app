@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,12 +11,9 @@ import 'screens/home/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  runApp(
-    const ProviderScope(
-      child: RankUpNaApp(),
-    ),
-  );
+  await Firebase.initializeApp();
+
+  runApp(const ProviderScope(child: RankUpNaApp()));
 }
 
 class RankUpNaApp extends ConsumerWidget {
@@ -28,41 +26,39 @@ class RankUpNaApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      routerConfig: _createRouter(),
-    );
-  }
-
-  GoRouter _createRouter() {
-    return GoRouter(
-      initialLocation: '/onboarding',
-      redirect: (context, state) {
-        // For now, allow access to onboarding
-        // TODO: Add proper authentication flow later
-        return null;
-      },
-      routes: [
-        // Auth routes
-        GoRoute(
-          path: '/auth/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
-          path: '/auth/register',
-          builder: (context, state) => const RegisterScreen(),
-        ),
-        
-        // Onboarding (for new users)
-        GoRoute(
-          path: '/onboarding',
-          builder: (context, state) => const OnboardingScreen(),
-        ),
-        
-        // Main app routes (protected)
-        GoRoute(
-          path: '/home',
-          builder: (context, state) => const HomeScreen(),
-        ),
-      ],
+      routerConfig: _router,
     );
   }
 }
+
+final _router = GoRouter(
+  initialLocation: '/onboarding',
+  redirect: (context, state) {
+    // TODO: Add proper authentication redirect logic later
+    // For now, allow access to all routes
+    return null;
+  },
+  routes: [
+    // Auth routes
+    GoRoute(
+      path: '/auth/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/auth/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    
+    // Onboarding (for new users)
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+    
+    // Main app routes (protected)
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const HomeScreen(),
+    ),
+  ],
+);

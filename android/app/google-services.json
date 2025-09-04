@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "447216520653",
+    "firebase_url": "https://smart-speak-demo-default-rtdb.firebaseio.com",
+    "project_id": "smart-speak-demo",
+    "storage_bucket": "smart-speak-demo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447216520653:android:cb94abc218a9c551b90884",
+        "android_client_info": {
+          "package_name": "com.example.coincollectioncargame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiIMatatPZR-z77d6Br-Z6vG927KyiR3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447216520653:android:487a718341ae1af4b90884",
+        "android_client_info": {
+          "package_name": "com.example.fit_quest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiIMatatPZR-z77d6Br-Z6vG927KyiR3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447216520653:android:5e362675ef711361b90884",
+        "android_client_info": {
+          "package_name": "com.example.fitquest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiIMatatPZR-z77d6Br-Z6vG927KyiR3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447216520653:android:54f324ced9bb4ae8b90884",
+        "android_client_info": {
+          "package_name": "com.example.hello_world_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiIMatatPZR-z77d6Br-Z6vG927KyiR3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447216520653:android:043a8369afbc69bab90884",
+        "android_client_info": {
+          "package_name": "com.example.smartspeak_ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiIMatatPZR-z77d6Br-Z6vG927KyiR3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
